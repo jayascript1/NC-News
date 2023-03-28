@@ -14,8 +14,7 @@ describe("GET /api/topics", () => {
       .expect(200)
       .then((res) => {
         const topics = res.body.topics;
-        expect(Array.isArray(topics)).toEqual(true);
-        expect(topics.length).toBeGreaterThan(0);
+        expect(topics.length).toEqual(3);
         topics.forEach((topic) => {
           expect(topic).toHaveProperty("slug");
           expect(topic).toHaveProperty("description");
