@@ -1,6 +1,10 @@
 const app = require("../app");
 const request = require("supertest");
 const db = require("../db/connection");
+const seed = require("../db/seeds/seed");
+const testData = require("../db/data/test-data");
+
+beforeEach(() => seed(testData));
 
 describe("GET /api/topics", () => {
   it("responds with an array with 'slug' and 'description' properties", () => {
@@ -9,7 +13,6 @@ describe("GET /api/topics", () => {
       .expect(200)
       .then((res) => {
         const topics = res.body.topics;
-        expect(Array.isArray(topics)).toEqual(true);
         expect(topics.length).toBeGreaterThan(0);
         topics.forEach((topic) => {
           expect(topic).toHaveProperty("slug");
@@ -17,9 +20,6 @@ describe("GET /api/topics", () => {
         });
       });
   });
-});
-
-describe("Invalid Paths", () => {
   it("responds with a 404 Not Found error for invalid paths", () => {
     return request(app)
       .get("/invalid-path")
@@ -38,15 +38,34 @@ describe("GET /api/articles/:article_id", () => {
       .expect(200)
       .then((res) => {
         const article = res.body;
-        expect(typeof article).toBe("object");
-        expect(article).toHaveProperty("author");
-        expect(article).toHaveProperty("title");
-        expect(article).toHaveProperty("article_id");
-        expect(article).toHaveProperty("body");
-        expect(article).toHaveProperty("topic");
-        expect(article).toHaveProperty("created_at");
-        expect(article).toHaveProperty("votes");
-        expect(article).toHaveProperty("article_img_url");
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+  it("responds with a 404 error when article ID isn't in the database", () => {
+    return request(app)
+      .get("/api/articles/99999")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toBe("Article not found");
+      });
+  });
+  it("responds with a 400 error when article ID is not a number", () => {
+    return request(app)
+      .get("/api/articles/not-a-number")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Invalid article ID");
       });
   });
 });
+
+afterAll(() => db.end());
