@@ -1,0 +1,11 @@
+const db = require('../db/connection')
+const { fetchTopics } = require('../models/topics')
+
+exports.getTopics = (req, res, next) => {
+    fetchTopics().then((topics) => {
+        res.status(200).send({ topics })
+    })
+    .catch((err) => {
+        throw new Error(err)
+    })
+}
