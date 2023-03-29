@@ -68,4 +68,44 @@ describe("GET /api/articles/:article_id", () => {
   });
 });
 
+describe("GET /api/articles", () => {
+  it("responds with an array of article objects, each containing the required properties and a numeric comment_count, sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        const articles = res.body.articles;
+        expect(articles.length).toBeGreaterThan(1);
+        articles.forEach((article, i) => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+          if (i > 0) {
+            const prevArticle = articles[i - 1];
+            const currentDate = new Date(article.created_at);
+            const previousDate = new Date(prevArticle.created_at);
+            expect(currentDate.getTime()).toBeLessThanOrEqual(
+              previousDate.getTime()
+            );
+          }
+        });
+      })
+    });
+    it("responds with a 404 Not Found error for invalid paths", () => {
+      return request(app)
+        .get("/invalid-path")
+        .expect(404)
+        .then((res) => {
+          expect(res.body.message).toBe("Not Found");
+        });
+    });
+  });
+
 afterAll(() => db.end());
