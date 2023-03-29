@@ -3,6 +3,7 @@ const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
+const sorted = require('jest-sorted')
 
 beforeEach(() => seed(testData));
 
@@ -76,6 +77,7 @@ describe("GET /api/articles", () => {
       .then((res) => {
         const articles = res.body.articles;
         expect(articles.length).toBeGreaterThan(1);
+        expect(articles).toBeSortedBy("created_at", { descending: true });
         articles.forEach((article, i) => {
           expect(article).toMatchObject({
             author: expect.any(String),
@@ -87,14 +89,6 @@ describe("GET /api/articles", () => {
             article_img_url: expect.any(String),
             comment_count: expect.any(Number),
           });
-          if (i > 0) {
-            const prevArticle = articles[i - 1];
-            const currentDate = new Date(article.created_at);
-            const previousDate = new Date(prevArticle.created_at);
-            expect(currentDate.getTime()).toBeLessThanOrEqual(
-              previousDate.getTime()
-            );
-          }
         });
       })
     });
