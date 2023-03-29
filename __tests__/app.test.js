@@ -102,4 +102,52 @@ describe("GET /api/articles", () => {
     });
   });
 
+  describe("GET /api/articles/:article_id/comments", () => {
+    it("responds with an array of comments for the given article_id with the required properties", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then((res) => {
+          const comments = res.body;
+          comments.forEach((comment) => {
+            expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+            });
+          });
+        });
+    });
+    it("serves the most recent comments first", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then((res) => {
+          const comments = res.body;
+          expect(comments.length).toBeGreaterThan(0);
+          const timestamps = comments.map((comment) =>
+            new Date(comment.created_at).getTime()
+          );
+        });
+    });
+    it("handles 404 error when the article_id does not exist", () => {
+      return request(app)
+        .get("/api/articles/999/comments")
+        .then((res) => {
+          expect(404);
+          expect(res.body.message).toEqual("Article not found");
+        });
+    });
+    it("handles 400 error when the article_id is not a number", () => {
+      return request(app)
+        .get("/api/articles/invalid-id/comments")
+        .then((res) => {
+          expect(400);
+          expect(res.body.message).toEqual("Invalid article ID");
+        });
+    });
+  });
 afterAll(() => db.end());
