@@ -155,22 +155,30 @@ describe("GET /api/articles/:article_id/comments", () => {
 
 
 describe('POST /api/articles/:article_id/comments', () => {
-  it('returns the posted comment', () => {
-    const newComment = { username: 'butter_bridge', body: 'test body' };
-    const articleId = 1;
-    return request(app)
-    .post(`/api/articles/${articleId}/comments`)
-    .send(newComment)
-    .expect(201)
-    .then((res) => {
-      const postedComment = res.body.comment;
-      expect(postedComment.author).toEqual(newComment.username);
-      expect(postedComment.body).toEqual(newComment.body);
-      expect(postedComment.article_id).toEqual(articleId);
+  describe('POST /api/articles/:article_id/comments', () => {
+    it('returns the posted comment with the required properties', () => {
+      const newComment = { username: 'butter_bridge', body: 'test body' };
+      const articleId = 1;
+      return request(app)
+        .post(`/api/articles/${articleId}/comments`)
+        .send(newComment)
+        .expect(201)
+        .then((res) => {
+          const postedComment = res.body.comment;
+          expect(postedComment).toMatchObject({
+            author: newComment.username,
+            article_id: articleId,
+            body: newComment.body,
+            votes: 0
+          });
+          expect(postedComment).toHaveProperty('comment_id');
+          expect(postedComment).toHaveProperty('created_at');
+        });
     });
   });
   
-  it('returns a 400 error when missing required properties', () => {
+  
+   it('returns a 400 error when missing required properties', () => {
     const invalidComment = { body: 'test body' };
     const articleId = 1;
     
@@ -182,6 +190,20 @@ describe('POST /api/articles/:article_id/comments', () => {
       expect(res.body.message).toEqual('Bad request');
     });
   });
+
+  it('returns a 400 error when missing required properties', () => {
+    const invalidComment = { username: 'butter_bridge' };
+    const articleId = 1;
+    
+    return request(app)
+    .post(`/api/articles/${articleId}/comments`)
+    .send(invalidComment)
+    .expect(400)
+    .then((res) => {
+      expect(res.body.message).toEqual('Bad request');
+    });
+  });
+
   
   it('returns a 404 error when article_id does not exist', () => {
     const newComment = { username: 'butter_bridge', body: 'test body' };

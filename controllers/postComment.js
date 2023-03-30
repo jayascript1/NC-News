@@ -4,18 +4,11 @@ const { fetchArticleById } = require("../models/article_id");
 exports.postComment = (req, res, next) => {
   const { username, body } = req.body;
   const article_id = req.params.article_id;
-
-  if (isNaN(article_id)) {
-    const err = new Error("Bad request");
-    err.status = 400;
-    throw err;
-  }
   if (!username || !body) {
     const err = new Error("Bad request");
     err.status = 400;
     throw err;
   }
-
   fetchArticleById(article_id)
     .then((article) => {
       if (!article) {
@@ -28,7 +21,6 @@ exports.postComment = (req, res, next) => {
       insertComment({ username, body }, article_id).then((comment) => {
         res.status(201).send({
           comment,
-          message: "Added successfully",
         });
       });
     })
