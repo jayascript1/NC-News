@@ -153,16 +153,16 @@ describe("GET /api/articles/:article_id/comments", () => {
   it("handles 404 error when the article_id does not exist", () => {
     return request(app)
       .get("/api/articles/999/comments")
+      .expect(404)
       .then((res) => {
-        expect(404);
         expect(res.body.message).toEqual("Article not found");
       });
   });
   it("handles 400 error when the article_id is not a number", () => {
     return request(app)
       .get("/api/articles/invalid-id/comments")
+      .expect(400)
       .then((res) => {
-        expect(400);
         expect(res.body.message).toEqual("Invalid article ID");
       });
   });

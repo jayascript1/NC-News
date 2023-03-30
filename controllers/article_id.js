@@ -3,7 +3,10 @@ const { fetchArticleById } = require("../models/article_id");
 exports.getArticleById = (req, res, next) => {
   const articleId = req.params.article_id;
   if (isNaN(articleId)) {
-    return res.status(400).json({ message: "Invalid article ID" });
+    const err = new Error('Invalid article ID')
+    err.status = 400
+    throw err
+    console.log('here')
   }
   fetchArticleById(articleId)
     .then((article) => {
