@@ -4,11 +4,6 @@ const { fetchArticleById } = require("../models/article_id");
 exports.postComment = (req, res, next) => {
   const { username, body } = req.body;
   const article_id = req.params.article_id;
-  if (!username || !body) {
-    const err = new Error("Bad request");
-    err.status = 400;
-    throw err;
-  }
   fetchArticleById(article_id)
     .then((article) => {
       if (!article) {
