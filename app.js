@@ -27,7 +27,13 @@ app.use((err, req, res, next) => {
     res.status(400).send({ message: "Bad request" });
   } else if (err.status === 404) {
     res.status(404).send({ message: "Not found" });
-  }
+  } else {next(err)}
+  
+  
+//   app.use(())
+//   else if ( err.constraint === 'comments_author_fkey') {
+//     res.status(404).send({ message: 'User not found'})
+//   } else {console.log(err)}
 });
 
 module.exports = app;
