@@ -1,16 +1,28 @@
 const { fetchCommentsByArticleId } = require('../models/comments');
+const { fetchArticleById } = require('../models/article_id');
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const articleId = req.params.article_id;
   if (isNaN(articleId)) {
-    return res.status(400).json({ message: 'Invalid article ID' });
+    const err = new Error('Invalid article ID')
+    err.status = 400
+    throw err
   }
-  fetchCommentsByArticleId(articleId)
-    .then((comment) => {
-      if (comment.length === 0) {
-        return res.status(404).send({ message: 'Article not found'})
+  fetchArticleById(articleId)
+    .then((article) => {
+      if (!article) {
+        const err = new Error('Article not found')
+        err.status = 404
+        throw err
       }
-      return res.status(200).json(comment);
+      fetchCommentsByArticleId(articleId)
+        .then((comments) => {
+          if (comments.length === 0) {
+            return res.status(200).json({comments: []});
+          }
+          return res.status(200).json({comments: comments});
+        })
+        .catch(next);
     })
-    .catch(next)
-}
+    .catch(next);
+};

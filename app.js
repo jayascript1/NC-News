@@ -19,14 +19,14 @@ app.all("/*", (req, res) => {
 
 app.use((err, req, res, next) => {
   if (err.status === 400) {
-    res.status(400).send({error: "Bad request"})
-  }
-  else if (err.status === 404) {
-    res.status(404).send({ error: "Not found" });
+    res.status(400).send({ message: "Invalid article ID" });
+  } else if (err.status === 404) {
+    res.status(404).send({ message: "Article not found" });
+  } else if (err.status === 404 && err.message === "Invalid article ID") {
+    res.status(404).send({ message: "Invalid article ID" });
   } else {
-    console.error(err);
-    res.status(500).send({ error: "Internal server error" });
-  } 
+    res.status(500).send({ message: "Internal server error" });
+  }
 });
 
 module.exports = app;
