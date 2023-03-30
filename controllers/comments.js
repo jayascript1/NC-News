@@ -17,9 +17,6 @@ exports.getCommentsByArticleId = (req, res, next) => {
       }
       fetchCommentsByArticleId(articleId)
         .then((comments) => {
-          if (comments.length === 0) {
-            return res.status(200).json({comments: []});
-          }
           return res.status(200).json({comments: comments});
         })
         .catch(next);

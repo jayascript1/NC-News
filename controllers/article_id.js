@@ -6,7 +6,6 @@ exports.getArticleById = (req, res, next) => {
     const err = new Error('Invalid article ID')
     err.status = 400
     throw err
-    console.log('here')
   }
   fetchArticleById(articleId)
     .then((article) => {
