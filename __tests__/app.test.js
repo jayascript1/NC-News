@@ -56,7 +56,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/99999")
       .expect(404)
       .then((res) => {
-        expect(res.body.message).toBe("Article not found");
+        expect(res.body.message).toBe("Not found");
       });
   });
   it("responds with a 400 error when article ID is not a number", () => {
@@ -64,7 +64,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/not-a-number")
       .expect(400)
       .then((res) => {
-        expect(res.body.message).toBe("Invalid article ID");
+        expect(res.body.message).toBe("Bad request");
       });
   });
 });
@@ -140,7 +140,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/999/comments")
       .expect(404)
       .then((res) => {
-        expect(res.body.message).toEqual("Article not found");
+        expect(res.body.message).toEqual("Not found");
       });
   });
   it("handles 400 error when the article_id is not a number", () => {
@@ -148,8 +148,52 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/invalid-id/comments")
       .expect(400)
       .then((res) => {
-        expect(res.body.message).toEqual("Invalid article ID");
+        expect(res.body.message).toEqual("Bad request");
       });
+  });
+});
+
+
+describe('POST /api/articles/:article_id/comments', () => {
+  it('returns the posted comment', () => {
+    const newComment = { username: 'butter_bridge', body: 'test body' };
+    const articleId = 1;
+    return request(app)
+    .post(`/api/articles/${articleId}/comments`)
+    .send(newComment)
+    .expect(201)
+    .then((res) => {
+      const postedComment = res.body.comment;
+      expect(postedComment.author).toEqual(newComment.username);
+      expect(postedComment.body).toEqual(newComment.body);
+      expect(postedComment.article_id).toEqual(articleId);
+    });
+  });
+  
+  it('returns a 400 error when missing required properties', () => {
+    const invalidComment = { body: 'test body' };
+    const articleId = 1;
+    
+    return request(app)
+    .post(`/api/articles/${articleId}/comments`)
+    .send(invalidComment)
+    .expect(400)
+    .then((res) => {
+      expect(res.body.message).toEqual('Bad request');
+    });
+  });
+  
+  it('returns a 404 error when article_id does not exist', () => {
+    const newComment = { username: 'butter_bridge', body: 'test body' };
+    const articleId = 999;
+    
+    return request(app)
+    .post(`/api/articles/${articleId}/comments`)
+    .send(newComment)
+    .expect(404)
+    .then((res) => {
+      expect(res.body.message).toEqual('Not found');
+    });
   });
 });
 afterAll(() => db.end());
