@@ -472,4 +472,30 @@ describe('GET /api/articles', () => {
         });
       });
   });
+  it("responds with status 400 for an invalid sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=bananas")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toEqual("Bad request");
+      });
+  });
+  
+  it("responds with status 400 for an invalid order query", () => {
+    return request(app)
+      .get("/api/articles?order=bananas")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toEqual("Bad request");
+      });
+  });
+  
+  it("responds with status 404 for a non-existent topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=bananas")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toEqual("Not found");
+      });
+  });
 });

@@ -36,7 +36,7 @@ app.use((err, req, res, next) => {
   } else if (err.status === 400) {
     res.status(400).send({ message: "Bad request" });
   } else if (err.status === 404) {
-    res.status(404).send({ message: "Article not found" });
+    res.status(404).send({ message: "Not found" });
   } else if (err.code === "23502" && err.column === "author") {
     res.status(400).send({ message: "Username not provided" });
   } else if (err.code === "23502" && err.column === "body") {
