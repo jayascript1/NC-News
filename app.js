@@ -22,7 +22,9 @@ app.all("/*", (req, res) => {
   res.status(404).send({ message: "Not Found" });
 });
 app.use((err, req, res, next) => {
-  if (err.status === 400) {
+  if (err.code === '22P02') {
+    res.status(400).send({ message: 'Artice ID must be a number'})
+  } else if (err.status === 400){
     res.status(400).send({ message: 'Bad request'})
   } else if (err.status === 404) {
     res.status(404).send({ message: 'Article not found'})
