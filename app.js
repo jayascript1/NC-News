@@ -5,6 +5,7 @@ const { getArticleById } = require("./controllers/article_id");
 const { getArticles } = require("./controllers/articles");
 const { getCommentsByArticleId } = require("./controllers/comments");
 const { postComment } = require("./controllers/postComment");
+const { patchArticleVotes } = require("./controllers/patchArticleVotes");
 
 app.use(express.json());
 
@@ -17,6 +18,8 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.post("/api/articles/:article_id/comments", postComment);
+
+app.patch("/api/articles/:article_id", patchArticleVotes);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ message: "Not Found" });
@@ -36,6 +39,8 @@ app.use((err, req, res, next) => {
     res.status(400).send({ message: "User not found" });
   } else if (err.constraint === "comments_article_id_fkey") {
     res.status(404).send({ message: "Article not found" });
+  } else if (err.code === '23502' && err.column === 'votes') {
+    res.status(400).send({ message: "Input is empty"})
   } else {
     console.log(err);
   }

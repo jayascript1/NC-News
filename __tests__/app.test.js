@@ -248,4 +248,127 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("PATCH /api/articles/:article_id", () => {
+  it("returns a 400 error when passed an empty object", () => {
+    const patchVotes = {};
+    const articleId = 1;
+    return request(app)
+      .patch(`/api/articles/${articleId}`)
+      .send(patchVotes)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toEqual("Input is empty");
+      });
+  });
+  it("updates the votes for a given article ID when number to increment by is positive", () => {
+    patchedArticle = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      created_at: "2020-07-09T20:11:00.000Z",
+      votes: 103,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    const patchVotes = { inc_votes: 3 };
+    const articleId = 1;
+    return request(app)
+      .patch(`/api/articles/${articleId}`)
+      .send(patchVotes)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article).toEqual(patchedArticle);
+        expect(res.body.message).toEqual("Article votes updated");
+      });
+  });
+  it("updates the votes for a given article ID when number to increment by is negative", () => {
+    patchedArticle = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      created_at: "2020-07-09T20:11:00.000Z",
+      votes: 97,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    const patchVotes = { inc_votes: -3 };
+    const articleId = 1;
+    return request(app)
+      .patch(`/api/articles/${articleId}`)
+      .send(patchVotes)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article).toEqual(patchedArticle);
+        expect(res.body.message).toEqual("Article votes updated");
+      });
+  });
+  it("returns a 400 error when inc_votes isn't a number'", () => {
+    const patchVotes = { inc_votes: "NaN" };
+    const articleId = 1;
+    return request(app)
+      .patch(`/api/articles/${articleId}`)
+      .send(patchVotes)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toEqual("Number not received when expected");
+      });
+  });
+  it("responds with a 400 error when article ID is not a number", () => {
+    const patchVotes = { inc_votes: 3 };
+    return request(app)
+      .patch("/api/articles/not-a-number")
+      .send(patchVotes)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Number not received when expected");
+      });
+  });
+  it("returns a 404 error when article_id does not exist", () => {
+    const patchVotes = { inc_votes: 3 };
+    const articleId = 999;
+    return request(app)
+      .patch(`/api/articles/${articleId}`)
+      .send(patchVotes)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toEqual("Not found");
+      });
+  });
+  it("returns a 400 error when inc_votes isn't a number'", () => {
+    const patchVotes = { inc_votes: "NaN" };
+    const articleId = 1;
+    return request(app)
+      .patch(`/api/articles/${articleId}`)
+      .send(patchVotes)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toEqual("Number not received when expected");
+      });
+  });
+  it("responds with a 400 error when article ID is not a number", () => {
+    const patchVotes = { inc_votes: 3 };
+    return request(app)
+      .patch("/api/articles/not-a-number")
+      .send(patchVotes)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Number not received when expected");
+      });
+  });
+  it("returns a 404 error when article_id does not exist", () => {
+    const patchVotes = { inc_votes: 3 };
+    const articleId = 999;
+    return request(app)
+      .patch(`/api/articles/${articleId}`)
+      .send(patchVotes)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toEqual("Not found");
+      });
+  });
+});
+
+
 afterAll(() => db.end());
