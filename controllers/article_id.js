@@ -9,5 +9,5 @@ exports.getArticleById = (req, res, next) => {
       }
       return res.status(200).json(article);
     })
-    .catch(next)
-    }
+    .catch(next);
+};

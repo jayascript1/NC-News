@@ -1,4 +1,4 @@
-const { insertComment } = require('../models/insertComment');
+const { insertComment } = require("../models/insertComment");
 
 exports.postComment = (req, res, next) => {
   const { username, body } = req.body;
@@ -7,7 +7,5 @@ exports.postComment = (req, res, next) => {
     .then((comment) => {
       res.status(201).send({ comment });
     })
-    .catch((err) => {
-        next(err);
-      })
-    }
+    .catch(next);
+};
