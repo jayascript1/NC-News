@@ -499,3 +499,26 @@ describe('GET /api/articles', () => {
       });
   });
 });
+
+describe("GET /api/article/:article_id", () => {
+  it("responds with a corresponding article object that has the following properties:\
+  author, title, article_id, body, topic, created_at, votes, article_img_url", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((res) => {
+        const article = res.body;
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+          comment_count: expect.any(Number),
+        });
+      });
+  });
+});
