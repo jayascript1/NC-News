@@ -64,7 +64,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/not-a-number")
       .expect(400)
       .then((res) => {
-        expect(res.body.message).toBe("Artice ID must be a number");
+        expect(res.body.message).toBe("Article ID must be a number");
       });
   });
 });

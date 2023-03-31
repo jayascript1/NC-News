@@ -23,7 +23,7 @@ app.all("/*", (req, res) => {
 });
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
-    res.status(400).send({ message: "Artice ID must be a number" });
+    res.status(400).send({ message: "Article ID must be a number" });
   } else if (err.status === 400) {
     res.status(400).send({ message: "Bad request" });
   } else if (err.status === 404) {
