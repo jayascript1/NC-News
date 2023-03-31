@@ -175,7 +175,11 @@ describe("POST /api/articles/:article_id/comments", () => {
     });
   });
   it("returns the posted comment with the required properties and ignores extra properties", () => {
-    const newComment = { username: "butter_bridge", body: "test body", ignoredProp: "something ignored" };
+    const newComment = {
+      username: "butter_bridge",
+      body: "test body",
+      ignoredProp: "something ignored",
+    };
     const articleId = 1;
     return request(app)
       .post(`/api/articles/${articleId}/comments`)
@@ -370,5 +374,32 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-
+describe("DELETE /api/comments/:comment_id", () => {
+  it("deletes the given comment and returns undefined", () => {
+    const commentId = 1;
+    return request(app)
+      .delete(`/api/comments/${commentId}`)
+      .expect(204)
+      .then((res) => {
+        expect(res.rows).toBeUndefined();
+      });
+  });
+  it("responds with a 400 error when comment_id is not a number", () => {
+    return request(app)
+      .delete("/api/comments/not-a-number")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Number not received when expected");
+      });
+  });
+  it("returns a 204 error and undefined when comment_id does not exist", () => {
+    const commentId = 999;
+    return request(app)
+      .delete(`/api/comments/${commentId}`)
+      .expect(204)
+      .then((res) => {
+        expect(res.body.message).toBeUndefined();
+      });
+  });
+});
 afterAll(() => db.end());
