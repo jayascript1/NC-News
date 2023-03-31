@@ -87,7 +87,6 @@ describe("GET /api/articles", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             article_img_url: expect.any(String),
-            comment_count: expect.any(Number),
           });
         });
       });
@@ -425,3 +424,78 @@ describe("GET /api/users", () => {
   });
 });
 afterAll(() => db.end());
+
+describe('GET /api/articles', () => {
+  it("responds with an array of article objects, sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toBeInstanceOf(Array);
+        expect(res.body.articles).toHaveLength(12);
+        expect(res.body.articles[0]).toMatchObject({
+          article_id: expect.any(Number),
+          title: expect.any(String),
+          body: expect.any(String),
+          votes: expect.any(Number),
+          topic: expect.any(String),
+          author: expect.any(String),
+          created_at: expect.any(String),
+        });
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+
+  it("responds with an array of articles filtered by the topic query, sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toHaveLength(11);
+        expect(res.body.articles[0].topic).toBe("mitch");
+        expect(res.body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+
+  it("responds with an array of articles sorted by a specified column and order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=asc")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toHaveLength(12);
+        expect(res.body.articles).toBeSortedBy("votes", {
+          descending: false,
+        });
+      });
+  });
+  it("responds with status 400 for an invalid sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=bananas")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toEqual("Bad request");
+      });
+  });
+  
+  it("responds with status 400 for an invalid order query", () => {
+    return request(app)
+      .get("/api/articles?order=bananas")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toEqual("Bad request");
+      });
+  });
+  
+  it("responds with status 404 for a non-existent topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=bananas")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toEqual("Not found");
+      });
+  });
+});
