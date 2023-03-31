@@ -392,14 +392,9 @@ describe("DELETE /api/comments/:comment_id", () => {
         expect(res.body.message).toBe("Number not received when expected");
       });
   });
-  it("returns a 204 error and undefined when comment_id does not exist", () => {
+  it("returns a 404 error and undefined when comment_id does not exist", () => {
     const commentId = 999;
-    return request(app)
-      .delete(`/api/comments/${commentId}`)
-      .expect(204)
-      .then((res) => {
-        expect(res.body.message).toBeUndefined();
-      });
+    return request(app).delete(`/api/comments/${commentId}`).expect(404);
   });
 });
 afterAll(() => db.end());
