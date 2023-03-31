@@ -174,6 +174,26 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
     });
   });
+  it("returns the posted comment with the required properties and ignores extra properties", () => {
+    const newComment = { username: "butter_bridge", body: "test body", ignoredProp: "something ignored" };
+    const articleId = 1;
+    return request(app)
+      .post(`/api/articles/${articleId}/comments`)
+      .send(newComment)
+      .expect(201)
+      .then((res) => {
+        const postedComment = res.body.comment;
+        expect(postedComment).toMatchObject({
+          author: newComment.username,
+          article_id: articleId,
+          body: newComment.body,
+          votes: 0,
+        });
+        expect(postedComment).toHaveProperty("comment_id");
+        expect(postedComment).toHaveProperty("created_at");
+        expect(postedComment).not.toHaveProperty("ignoredProp");
+      });
+  });
   it("returns a 400 error when missing 'username'", () => {
     const invalidComment = { body: "test body" };
     const articleId = 1;
