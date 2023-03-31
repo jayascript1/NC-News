@@ -139,7 +139,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/999/comments")
       .expect(404)
       .then((res) => {
-        expect(res.body.message).toEqual("Article not found");
+        expect(res.body.message).toEqual("Not found");
       });
   });
   it("handles 400 error when the article_id is not a number", () => {
@@ -147,7 +147,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/invalid-id/comments")
       .expect(400)
       .then((res) => {
-        expect(res.body.message).toEqual("Bad request");
+        expect(res.body.message).toEqual("Number not received when expected");
       });
   });
 });
