@@ -397,4 +397,31 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app).delete(`/api/comments/${commentId}`).expect(404);
   });
 });
+
+describe("GET /api/users", () => {
+  it("responds with an array of user objects, each containing the required properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((res) => {
+        const users = res.body.users;
+        expect(users.length).toBeGreaterThan(1);
+        users.forEach((users) => {
+          expect(users).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+  it("responds with a 404 Not Found error for invalid paths", () => {
+    return request(app)
+      .get("/invalid-path")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toBe("Not Found");
+      });
+  });
+});
 afterAll(() => db.end());
